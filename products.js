@@ -21,7 +21,7 @@ let lessons = [
     location: "Mill Hill",
     price: 75,
     spaces: 5,
-    image: "images/dance.jpg"
+    image: "images/Dance.jpg"
   },
   {
     id: 4,
@@ -29,7 +29,7 @@ let lessons = [
     location: "Camden",
     price: 80,
     spaces: 5,
-    image: "images/drama.jpg"
+    image: "images/Drama.jpg"
   },
   {
     id: 5,
