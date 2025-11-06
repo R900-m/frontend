@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>After School Activities</title>
+  <link rel="stylesheet" href="style1.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- HEADER -->
+    <header>
+      <h1>{{ sitename }}</h1>
+      <button @click="toggleView" :disabled="cart.length === 0 && showLessons">
+        {{ showLessons ? 'View Cart (' + cart.length + ')' : 'Back to Lessons' }}
+      </button>
+    </header>
+
+    <!-- LESSONS PAGE -->
+    <main v-if="showLessons">
+      <h2>Available Lessons</h2>
+
+      <!-- Search -->
+      <input type="text" v-model="searchQuery" placeholder="Search lessons..." />
+
+      <!-- Sorting -->
+      <div class="sort-controls">
+        <label>Sort by:</label>
+        <select v-model="sortAttribute">
+          <option value="subject">Subject</option>
+          <option value="location">Location</option>
+          <option value="price">Price</option>
+          <option value="spaces">Spaces</option>
+        </select>
+
+        <label>Order:</label>
+        <select v-model="sortOrder">
+          <option value="ascending">Ascending</option>
+          <option value="descending">Descending</option>
+        </select>
+      </div>
+
+      <!-- Lesson Cards -->
+      <div class="lesson-list">
+        <div v-for="lesson in sortedLessons" :key="lesson.id" class="lesson-card">
+          <img :src="lesson.image" alt="Lesson Image" />
+          <h3>{{ lesson.subject }}</h3>
+          <p><strong>Location:</strong> {{ lesson.location }}</p>
+          <p><strong>Price:</strong> £{{ lesson.price }}</p>
+          <p><strong>Spaces left:</strong> {{ lesson.spaces }}</p>
+          <button @click="addToCart(lesson)" :disabled="lesson.spaces === 0">
+            {{ lesson.spaces === 0 ? 'Full' : 'Add to Cart' }}
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- CART PAGE -->
+    <main v-else class="cart-page">
+      <h2>Your Cart</h2>
+
+      <!-- Empty -->
+      <p v-if="cart.length === 0">Your cart is empty.</p>
+
+      <!-- Cart Items -->
+      <div v-else>
+        <div v-for="item in cart" :key="item.id" class="cart-item">
+          <img :src="item.image" alt="Lesson image" />
+          <div>
+            <h4>{{ item.subject }}</h4>
+            <p><strong>Location:</strong> {{ item.location }}</p>
+            <p><strong>Price:</strong> £{{ item.price }}</p>
+            <p>
+              <strong>Quantity:</strong>
+              <button @click="decreaseQuantity(item)" :disabled="item.quantity === 1">−</button>
+              {{ item.quantity }}
+              <button @click="increaseQuantity(item)" :disabled="lessons.find(l => l.id === item.id).spaces === 0">+</button>
+            </p>
+            <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
+          </div>
+          <button @click="removeFromCart(item)">Remove</button>
+        </div>
+
+        <!-- Checkout -->
+        <div class="checkout-form">
+          <h3>Checkout</h3>
+          <input type="text" v-model="name" placeholder="Enter your name" />
+          <input type="text" v-model="phone" placeholder="Enter phone number" />
+          <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
+          <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
+
+          <div v-if="orderConfirmed" class="confirmation">
+            ✅ Order submitted successfully! Thank you for booking.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="products.js"></script>
+  <script src="App.js"></script>
+</body>
+</html>
