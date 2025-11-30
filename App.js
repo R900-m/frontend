@@ -29,6 +29,8 @@ new Vue({
     },
 
     computed: {
+        // Sorting lessons by subject, location, price, etc.
+
         // SORT + FILTER lessons
         sortedLessons() {
             let sorted = this.lessons.slice();
