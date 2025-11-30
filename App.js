@@ -18,6 +18,7 @@ new Vue({
 
     // Load lessons from your Render backend when page loads
     mounted() {
+        // Fetch lessons from backend API 
         fetch("https://backend-1-sits.onrender.com/lessons")
             .then(res => res.json())
             .then(data => {
