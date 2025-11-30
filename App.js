@@ -74,6 +74,7 @@ new Vue({
         toggleView() {
             this.showLessons = !this.showLessons;
         },
+// Add lesson to cart
 
         addToCart(lesson) {
             if (lesson.space > 0) {
