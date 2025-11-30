@@ -1,3 +1,4 @@
+// products.js
 let lessons = [
   {
     id: 1,
@@ -5,7 +6,7 @@ let lessons = [
     location: "Golders Green",
     price: 85,
     spaces: 5,
-    image: "images/art.jpg"
+    icon: "fa-solid fa-paintbrush"
   },
   {
     id: 2,
@@ -13,7 +14,7 @@ let lessons = [
     location: "Barnet",
     price: 120,
     spaces: 5,
-    image: "images/coding.jpg"
+    icon: "fa-solid fa-laptop-code"
   },
   {
     id: 3,
@@ -21,7 +22,7 @@ let lessons = [
     location: "Mill Hill",
     price: 75,
     spaces: 5,
-    image: "images/dance.jpg"
+    icon: "fa-solid fa-person-dancing"
   },
   {
     id: 4,
@@ -29,7 +30,7 @@ let lessons = [
     location: "Camden",
     price: 80,
     spaces: 5,
-    image: "images/drama.jpg"
+    icon: "fa-solid fa-theater-masks"
   },
   {
     id: 5,
@@ -37,7 +38,7 @@ let lessons = [
     location: "Colindale",
     price: 90,
     spaces: 5,
-    image: "images/english.jpg"
+    icon: "fa-solid fa-book"
   },
   {
     id: 6,
@@ -45,7 +46,7 @@ let lessons = [
     location: "Hendon",
     price: 100,
     spaces: 5,
-    image: "images/math.jpg"
+    icon: "fa-solid fa-calculator"
   },
   {
     id: 7,
@@ -53,7 +54,7 @@ let lessons = [
     location: "Finchley",
     price: 95,
     spaces: 5,
-    image: "images/music.jpg"
+    icon: "fa-solid fa-music"
   },
   {
     id: 8,
@@ -61,7 +62,7 @@ let lessons = [
     location: "Hampstead",
     price: 105,
     spaces: 5,
-    image: "images/photography.jpg"
+    icon: "fa-solid fa-camera"
   },
   {
     id: 9,
@@ -69,7 +70,7 @@ let lessons = [
     location: "Cricklewood",
     price: 130,
     spaces: 5,
-    image: "images/robotics.jpg"
+    icon: "fa-solid fa-robot"
   },
   {
     id: 10,
@@ -77,6 +78,6 @@ let lessons = [
     location: "Brent",
     price: 110,
     spaces: 5,
-    image: "images/science.jpg"
+    icon: "fa-solid fa-flask"
   }
 ];

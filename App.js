@@ -1,6 +1,3 @@
-// app.js 
-// Initial Vue setup
-
 new Vue({
     el: "#app",
     data: {
@@ -9,33 +6,30 @@ new Vue({
         searchQuery: "",
         sortAttribute: "subject",
         sortOrder: "ascending",
-        lessons: [], // FETCH from Render backend
+
+        lessons: [],   // Loaded from backend
         cart: [],
         name: "",
         phone: "",
         orderConfirmed: false
     },
 
-    // Load lessons from your Render backend when page loads
     mounted() {
-        // Fetch lessons from backend API 
+        // Load lessons from backend
         fetch("https://backend-1-sits.onrender.com/lessons")
             .then(res => res.json())
             .then(data => {
                 this.lessons = data;
-                console.log("Lessons loaded:", data);
             })
             .catch(err => console.error("Error loading lessons:", err));
     },
 
     computed: {
-        // Sorting lessons by subject, location, price, etc.
-
-        // SORT + FILTER lessons
+        // FILTER + SORT
         sortedLessons() {
-            let sorted = this.lessons.slice();
+            let sorted = [...this.lessons];
 
-            // Sorting
+            // SORT
             sorted.sort((a, b) => {
                 let modifier = this.sortOrder === "ascending" ? 1 : -1;
                 if (a[this.sortAttribute] < b[this.sortAttribute]) return -1 * modifier;
@@ -43,9 +37,7 @@ new Vue({
                 return 0;
             });
 
-            // SEARCH (Frontend only)
-            // Searching lessons by subject or location
-
+            // FILTER
             if (this.searchQuery.trim() !== "") {
                 const q = this.searchQuery.toLowerCase();
                 sorted = sorted.filter(l =>
@@ -57,12 +49,13 @@ new Vue({
             return sorted;
         },
 
-        // Calculate total price
+        // TOTAL PRICE
         totalPrice() {
-            return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            return this.cart.reduce((sum, item) =>
+                sum + item.price * item.quantity, 0);
         },
 
-        // Checkout validation
+        // CHECKOUT VALIDATION
         isCheckoutValid() {
             const nameValid = /^[A-Za-z\s]+$/.test(this.name);
             const phoneValid = /^[0-9]+$/.test(this.phone);
@@ -74,16 +67,15 @@ new Vue({
         toggleView() {
             this.showLessons = !this.showLessons;
         },
-// Add lesson to cart
 
+        // ADD TO CART
         addToCart(lesson) {
-            if (lesson.space > 0) {
+            if (lesson.spaces > 0) {
                 let existing = this.cart.find(item => item.id === lesson._id);
 
                 if (existing) {
                     existing.quantity++;
                 } else {
-                    // Convert lesson to cart item
                     this.cart.push({
                         id: lesson._id,
                         subject: lesson.subject,
@@ -93,19 +85,16 @@ new Vue({
                     });
                 }
 
-                lesson.space--;
+                lesson.spaces--;
             }
         },
 
-// Increase lesson quantity
-// Decrease lesson quantity
-
-
         increaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-            if (lesson.space > 0) {
+
+            if (lesson.spaces > 0) {
                 item.quantity++;
-                lesson.space--;
+                lesson.spaces--;
             }
         },
 
@@ -114,7 +103,7 @@ new Vue({
 
             if (item.quantity > 1) {
                 item.quantity--;
-                lesson.space++;
+                lesson.spaces++;
             } else {
                 this.removeFromCart(item);
             }
@@ -122,14 +111,17 @@ new Vue({
 
         removeFromCart(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-            lesson.space += item.quantity;
+            lesson.spaces += item.quantity;
 
-            this.cart = this.cart.filter(cartItem => cartItem.id !== item.id);
+            this.cart = this.cart.filter(i => i.id !== item.id);
         },
 
-        // FULL CHECKOUT (POST ORDER TO BACKEND)
+        // CHECKOUT ORDER
         checkout() {
-            if (!this.isCheckoutValid) return;
+            if (!this.isCheckoutValid) {
+                alert("Please enter a valid name, phone number, and have at least one item.");
+                return;
+            }
 
             const order = {
                 name: this.name,
@@ -147,12 +139,10 @@ new Vue({
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log("Order saved:", data);
-
                     alert(`Thank you, ${this.name}! Your order has been submitted.`);
-
-                    // Reset UI
                     this.orderConfirmed = true;
+
+                    // RESET UI
                     this.cart = [];
                     this.name = "";
                     this.phone = "";
