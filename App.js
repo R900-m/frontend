@@ -1,4 +1,6 @@
-// app.js
+// app.js 
+// Initial Vue setup
+
 new Vue({
     el: "#app",
     data: {
