@@ -44,6 +44,8 @@ new Vue({
             });
 
             // SEARCH (Frontend only)
+            // Searching lessons by subject or location
+
             if (this.searchQuery.trim() !== "") {
                 const q = this.searchQuery.toLowerCase();
                 sorted = sorted.filter(l =>
