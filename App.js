@@ -97,6 +97,10 @@ new Vue({
             }
         },
 
+// Increase lesson quantity
+// Decrease lesson quantity
+
+
         increaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
             if (lesson.space > 0) {
