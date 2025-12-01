@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
     <title>After School Activities</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="style1.css">
 
-    <!-- Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <!-- Vue CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
 
 <body>
 <div id="app">
 
-    <!-- HEADER -->
     <header>
         <h1>{{ sitename }}</h1>
         <button @click="toggleView">
@@ -25,6 +22,7 @@
 
     <!-- LESSON PAGE -->
     <main v-if="showLessons">
+
         <h2>Available Lessons</h2>
 
         <input type="text" v-model="searchQuery" placeholder="Search lessons...">
@@ -35,7 +33,6 @@
                 <option value="topic">Topic</option>
                 <option value="location">Location</option>
                 <option value="price">Price</option>
-                <option value="space">Spaces</option>
             </select>
 
             <label>Order:</label>
@@ -47,7 +44,8 @@
 
         <div class="lesson-list">
             <div v-for="lesson in sortedLessons" :key="lesson._id" class="lesson-card">
-                <img :src="lesson.image" alt="Lesson image" />
+
+                <img :src="'Front-end' + lesson.image" alt="Lesson image">
 
                 <h3>{{ lesson.topic }}</h3>
                 <p><strong>Location:</strong> {{ lesson.location }}</p>
@@ -59,55 +57,61 @@
                 </button>
             </div>
         </div>
+
     </main>
 
     <!-- CART PAGE -->
     <main v-else class="cart-page">
         <h2>Your Cart</h2>
 
-        <div v-if="cart.length === 0">Your cart is empty.</div>
-
-        <div v-for="item in cart" :key="item.id" class="cart-item">
-            <img :src="item.image" alt="Lesson image">
-
-            <div>
-                <h4>{{ item.topic }}</h4>
-                <p><strong>Location:</strong> {{ item.location }}</p>
-                <p><strong>Price:</strong> £{{ item.price }}</p>
-
-                <p>
-                    <strong>Quantity:</strong>
-                    <button class="quantity-btn" @click="decreaseQuantity(item)">-</button>
-                    {{ item.quantity }}
-                    <button class="quantity-btn" @click="increaseQuantity(item)">+</button>
-                </p>
-
-                <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
-
-                <button @click="removeFromCart(item)">Remove</button>
-            </div>
+        <div v-if="cart.length === 0">
+            <p>Your cart is empty.</p>
         </div>
 
-        <!-- CHECKOUT -->
-        <div class="checkout-form" v-if="cart.length > 0">
-            <h3>Checkout</h3>
+        <div v-else>
+            <div v-for="item in cart" :key="item.id" class="cart-item">
 
-            <input type="text" v-model="name" placeholder="Enter your name">
-            <input type="text" v-model="phone" placeholder="Enter phone number">
+                <img :src="'Front-end' + item.image" />
 
-            <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
+                <div>
+                    <h4>{{ item.topic }}</h4>
+                    <p><strong>Location:</strong> {{ item.location }}</p>
+                    <p><strong>Price:</strong> £{{ item.price }}</p>
 
-            <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
+                    <p>
+                        <strong>Quantity:</strong>
+                        <button class="quantity-btn" @click="decreaseQuantity(item)">−</button>
+                        {{ item.quantity }}
+                        <button class="quantity-btn" @click="increaseQuantity(item)">+</button>
+                    </p>
 
-            <div v-if="orderConfirmed" class="confirmation">
-                ✓ Order submitted successfully! Thank you for booking.
+                    <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
+
+                    <button @click="removeFromCart(item)">Remove</button>
+                </div>
             </div>
+
+            <!-- CHECKOUT -->
+            <div class="checkout-form">
+                <h3>Checkout</h3>
+
+                <input type="text" v-model="name" placeholder="Enter your name">
+                <input type="text" v-model="phone" placeholder="Enter phone number">
+
+                <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
+
+                <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
+
+                <div v-if="orderConfirmed" class="confirmation">
+                    ✓ Order submitted successfully! Thank you for booking.
+                </div>
+            </div>
+
         </div>
     </main>
 
 </div>
 
-<!-- JS -->
 <script src="App.js"></script>
 
 </body>
