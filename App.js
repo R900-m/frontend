@@ -22,24 +22,20 @@ new Vue({
 
     methods: {
 
-        // Load lessons
         loadLessons() {
             fetch("https://backend-1-sits.onrender.com/lessons")
                 .then(res => res.json())
                 .then(data => {
                     this.lessons = data;
-                })
-                .catch(err => console.error("Error loading lessons:", err));
+                });
         },
 
         toggleView() {
             this.showLessons = !this.showLessons;
-            if (!this.showLessons) this.orderConfirmed = false;
         },
 
         addToCart(lesson) {
             if (lesson.space > 0) {
-
                 let existing = this.cart.find(i => i.id === lesson._id);
 
                 if (existing) {
@@ -81,15 +77,20 @@ new Vue({
 
         removeFromCart(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-
             if (lesson) lesson.space += item.quantity;
-
             this.cart = this.cart.filter(i => i.id !== item.id);
         },
 
         checkout() {
-            if (!this.isCheckoutValid) {
-                alert("Please enter a name (10+ letters) and phone (10+ digits).");
+
+            // SIMPLE 10-character rule
+            if (this.name.trim().length < 10) {
+                alert("Name must be at least 10 characters.");
+                return;
+            }
+
+            if (!/^[0-9]{10,}$/.test(this.phone)) {
+                alert("Phone must be at least 10 digits.");
                 return;
             }
 
@@ -109,35 +110,27 @@ new Vue({
             })
                 .then(res => res.json())
                 .then(() => {
-                    this.orderConfirmed = true;
+
+                    this.orderConfirmed = true;  // popup appears
 
                     this.cart = [];
                     this.name = "";
                     this.phone = "";
                     this.showLessons = true;
 
-                    // Reload spaces from DB
-                    this.loadLessons();
+                    this.loadLessons(); // reload from DB
 
-                    // Show success message longer
                     setTimeout(() => {
                         this.orderConfirmed = false;
-                    }, 3000);
-                })
-                .catch(err => {
-                    console.error("Checkout error:", err);
-                    alert("Something went wrong submitting your order.");
+                    }, 5000); // 5 seconds popup
                 });
         }
     },
 
     computed: {
-
-        // Filter + Sort
         sortedLessons() {
             let list = [...this.lessons];
 
-            // sort
             list.sort((a, b) => {
                 let mod = this.sortOrder === "ascending" ? 1 : -1;
                 if (a[this.sortAttribute] < b[this.sortAttribute]) return -1 * mod;
@@ -145,7 +138,6 @@ new Vue({
                 return 0;
             });
 
-            // search (NOW WORKS WITH NUMBERS)
             if (this.searchQuery.trim() !== "") {
                 const q = this.searchQuery.toLowerCase();
 
@@ -153,8 +145,7 @@ new Vue({
                     l.topic.toLowerCase().includes(q) ||
                     l.location.toLowerCase().includes(q) ||
                     l.price.toString().includes(q) ||
-                    l.space.toString().includes(q) ||
-                    l._id.toString().includes(q)
+                    l.space.toString().includes(q)
                 );
             }
 
@@ -166,11 +157,12 @@ new Vue({
                 sum + item.price * item.quantity, 0);
         },
 
-        // Input validation — NOW STRICT FOR LECTURER
         isCheckoutValid() {
-            const nameValid = /^[A-Za-z\s]{10,}$/.test(this.name);
-            const phoneValid = /^[0-9]{10,}$/.test(this.phone);
-            return nameValid && phoneValid && this.cart.length > 0;
+            return (
+                this.name.trim().length >= 10 &&
+                /^[0-9]{10,}$/.test(this.phone) &&
+                this.cart.length > 0
+            );
         }
     }
 });
