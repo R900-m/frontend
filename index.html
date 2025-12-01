@@ -45,8 +45,7 @@
         <!-- Lessons Grid -->
         <div class="lesson-list">
             <div v-for="lesson in sortedLessons" :key="lesson._id" class="lesson-card">
-                
-                <!-- 100% FIXED IMAGE PATH -->
+
                 <img :src="'images' + lesson.image.replace('/images', '')" alt="Lesson image" />
 
                 <h3>{{ lesson.topic }}</h3>
@@ -70,53 +69,4 @@
         </div>
 
         <div v-else>
-            <div v-for="item in cart" :key="item.id" class="cart-item">
-
-                <!-- FIXED CART IMAGE -->
-                <img :src="'images' + item.image.replace('/images', '')" />
-
-                <div>
-                    <h4>{{ item.topic }}</h4>
-                    <p><strong>Location:</strong> {{ item.location }}</p>
-                    <p><strong>Price:</strong> £{{ item.price }}</p>
-
-                    <p>
-                        <strong>Quantity:</strong>
-                        <button class="quantity-btn" @click="decreaseQuantity(item)">-</button>
-                        {{ item.quantity }}
-                        <button class="quantity-btn" @click="increaseQuantity(item)">+</button>
-                    </p>
-
-                    <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
-
-                    <button class="remove-btn" @click="removeFromCart(item)">Remove</button>
-                </div>
-
-            </div>
-
-            <!-- Checkout -->
-            <div class="checkout-form">
-                <h3>Checkout</h3>
-
-                <input type="text" v-model="name" placeholder="Enter your name" />
-                <input type="text" v-model="phone" placeholder="Enter phone number" />
-
-                <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
-
-                <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
-
-                <div v-if="orderConfirmed" class="confirmation">
-                    ✓ Order submitted successfully! Thank you for booking.
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-</div>
-
-<!-- JS -->
-<script src="App.js"></script>
-
-</body>
-</html>
+            <div v-for="i
