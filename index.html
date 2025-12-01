@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>After School Activities</title>
-
-    <link rel="stylesheet" href="style1.css">
-
-    <!-- Vue CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link rel="stylesheet" href="style1.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 </head>
 
 <body>
 <div id="app">
 
+    <!-- HEADER -->
     <header>
         <h1>{{ sitename }}</h1>
-        <button @click="toggleView">
+        <button @click="toggleView" :disabled="cart.length === 0 && showLessons">
             {{ showLessons ? 'View Cart (' + cart.length + ')' : 'Back to Lessons' }}
         </button>
     </header>
 
-    <!-- LESSON PAGE -->
+    <!-- LESSONS PAGE -->
     <main v-if="showLessons">
-
         <h2>Available Lessons</h2>
 
-        <input type="text" v-model="searchQuery" placeholder="Search lessons...">
+        <!-- Search -->
+        <input type="text" v-model="searchQuery" placeholder="Search lessons..." />
 
+        <!-- Sorting -->
         <div class="sort-controls">
             <label>Sort by:</label>
             <select v-model="sortAttribute">
                 <option value="topic">Topic</option>
                 <option value="location">Location</option>
                 <option value="price">Price</option>
+                <option value="space">Spaces</option>
             </select>
 
             <label>Order:</label>
@@ -42,10 +42,12 @@
             </select>
         </div>
 
+        <!-- Lessons Grid -->
         <div class="lesson-list">
             <div v-for="lesson in sortedLessons" :key="lesson._id" class="lesson-card">
-
-                <img :src="'Front-end' + lesson.image" alt="Lesson image">
+                
+                <!-- 100% FIXED IMAGE PATH -->
+                <img :src="'images' + lesson.image.replace('/images', '')" alt="Lesson image" />
 
                 <h3>{{ lesson.topic }}</h3>
                 <p><strong>Location:</strong> {{ lesson.location }}</p>
@@ -53,11 +55,10 @@
                 <p><strong>Spaces left:</strong> {{ lesson.space }}</p>
 
                 <button @click="addToCart(lesson)" :disabled="lesson.space === 0">
-                    {{ lesson.space === 0 ? 'Full' : 'Add to Cart' }}
+                    {{ lesson.space === 0 ? "Full" : "Add to Cart" }}
                 </button>
             </div>
         </div>
-
     </main>
 
     <!-- CART PAGE -->
@@ -71,7 +72,8 @@
         <div v-else>
             <div v-for="item in cart" :key="item.id" class="cart-item">
 
-                <img :src="'Front-end' + item.image" />
+                <!-- FIXED CART IMAGE -->
+                <img :src="'images' + item.image.replace('/images', '')" />
 
                 <div>
                     <h4>{{ item.topic }}</h4>
@@ -80,23 +82,24 @@
 
                     <p>
                         <strong>Quantity:</strong>
-                        <button class="quantity-btn" @click="decreaseQuantity(item)">−</button>
+                        <button class="quantity-btn" @click="decreaseQuantity(item)">-</button>
                         {{ item.quantity }}
                         <button class="quantity-btn" @click="increaseQuantity(item)">+</button>
                     </p>
 
                     <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
 
-                    <button @click="removeFromCart(item)">Remove</button>
+                    <button class="remove-btn" @click="removeFromCart(item)">Remove</button>
                 </div>
+
             </div>
 
-            <!-- CHECKOUT -->
+            <!-- Checkout -->
             <div class="checkout-form">
                 <h3>Checkout</h3>
 
-                <input type="text" v-model="name" placeholder="Enter your name">
-                <input type="text" v-model="phone" placeholder="Enter phone number">
+                <input type="text" v-model="name" placeholder="Enter your name" />
+                <input type="text" v-model="phone" placeholder="Enter phone number" />
 
                 <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
 
@@ -112,6 +115,7 @@
 
 </div>
 
+<!-- JS -->
 <script src="App.js"></script>
 
 </body>
