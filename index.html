@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>After School Activities</title>
-    <link rel="stylesheet" href="style1.css" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style1.css">
+
+    <!-- Vue -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 </head>
 
@@ -13,30 +18,24 @@
     <!-- HEADER -->
     <header>
         <h1>{{ sitename }}</h1>
-
-        <button 
-            @click="toggleView" 
-            :disabled="cart.length === 0 && showLessons">
+        <button @click="toggleView">
             {{ showLessons ? 'View Cart (' + cart.length + ')' : 'Back to Lessons' }}
         </button>
     </header>
 
-
-    <!-- LESSONS PAGE -->
+    <!-- LESSON PAGE -->
     <main v-if="showLessons">
         <h2>Available Lessons</h2>
 
-        <!-- Search -->
-        <input type="text" v-model="searchQuery" placeholder="Search lessons..." />
+        <input type="text" v-model="searchQuery" placeholder="Search lessons...">
 
-        <!-- Sorting -->
         <div class="sort-controls">
             <label>Sort by:</label>
             <select v-model="sortAttribute">
-                <option value="subject">Subject</option>
+                <option value="topic">Topic</option>
                 <option value="location">Location</option>
                 <option value="price">Price</option>
-                <option value="spaces">Spaces</option>
+                <option value="space">Spaces</option>
             </select>
 
             <label>Order:</label>
@@ -46,80 +45,69 @@
             </select>
         </div>
 
-        <!-- Lesson Cards -->
         <div class="lesson-list">
             <div v-for="lesson in sortedLessons" :key="lesson._id" class="lesson-card">
-                <img :src="lesson.image" alt="lesson image" />
+                <img :src="lesson.image" alt="Lesson image" />
 
-                <h3>{{ lesson.subject }}</h3>
+                <h3>{{ lesson.topic }}</h3>
                 <p><strong>Location:</strong> {{ lesson.location }}</p>
                 <p><strong>Price:</strong> £{{ lesson.price }}</p>
-                <p><strong>Spaces left:</strong> {{ lesson.spaces }}</p>
+                <p><strong>Spaces left:</strong> {{ lesson.space }}</p>
 
-                <button 
-                    @click="addToCart(lesson)"
-                    :disabled="lesson.spaces === 0">
-                    {{ lesson.spaces === 0 ? 'Full' : 'Add to Cart' }}
+                <button @click="addToCart(lesson)" :disabled="lesson.space === 0">
+                    {{ lesson.space === 0 ? 'Full' : 'Add to Cart' }}
                 </button>
             </div>
         </div>
     </main>
 
-
     <!-- CART PAGE -->
     <main v-else class="cart-page">
         <h2>Your Cart</h2>
 
-        <!-- Empty cart -->
-        <p v-if="cart.length === 0">Your cart is empty.</p>
+        <div v-if="cart.length === 0">Your cart is empty.</div>
 
-        <!-- Cart items -->
-        <div v-else>
-            <div v-for="item in cart" :key="item.id" class="cart-item">
-                <img :src="item.image" alt="Lesson image" />
+        <div v-for="item in cart" :key="item.id" class="cart-item">
+            <img :src="item.image" alt="Lesson image">
 
-                <div>
-                    <h4>{{ item.subject }}</h4>
-                    <p><strong>Location:</strong> {{ item.location }}</p>
-                    <p><strong>Price:</strong> £{{ item.price }}</p>
+            <div>
+                <h4>{{ item.topic }}</h4>
+                <p><strong>Location:</strong> {{ item.location }}</p>
+                <p><strong>Price:</strong> £{{ item.price }}</p>
 
-                    <p>
-                        <strong>Quantity:</strong>
-                        <button @click="decreaseQuantity(item)" :disabled="item.quantity === 1">−</button>
-                        {{ item.quantity }}
-                        <button 
-                            @click="increaseQuantity(item)" 
-                            :disabled="lessons.find(l => l._id === item.id).spaces === 0">+</button>
-                    </p>
+                <p>
+                    <strong>Quantity:</strong>
+                    <button class="quantity-btn" @click="decreaseQuantity(item)">-</button>
+                    {{ item.quantity }}
+                    <button class="quantity-btn" @click="increaseQuantity(item)">+</button>
+                </p>
 
-                    <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
-                </div>
+                <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
 
                 <button @click="removeFromCart(item)">Remove</button>
             </div>
+        </div>
 
-            <!-- Checkout -->
-            <div class="checkout-form">
-                <h3>Checkout</h3>
+        <!-- CHECKOUT -->
+        <div class="checkout-form" v-if="cart.length > 0">
+            <h3>Checkout</h3>
 
-                <input type="text" v-model="name" placeholder="Enter your name" />
-                <input type="text" v-model="phone" placeholder="Enter phone number" />
+            <input type="text" v-model="name" placeholder="Enter your name">
+            <input type="text" v-model="phone" placeholder="Enter phone number">
 
-                <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
+            <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
 
-                <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
+            <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
 
-                <div v-if="orderConfirmed" class="confirmation">
-                    ✔ Order submitted successfully! Thank you for booking.
-                </div>
+            <div v-if="orderConfirmed" class="confirmation">
+                ✓ Order submitted successfully! Thank you for booking.
             </div>
         </div>
     </main>
 
 </div>
 
-<!-- SCRIPTS -->
-<script src="products.js"></script>
+<!-- JS -->
 <script src="App.js"></script>
 
 </body>

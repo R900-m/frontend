@@ -4,10 +4,10 @@ new Vue({
         sitename: "After School Activities",
         showLessons: true,
         searchQuery: "",
-        sortAttribute: "subject",
+        sortAttribute: "topic",
         sortOrder: "ascending",
 
-        lessons: [],   // Loaded from backend
+        lessons: [],  // Loaded from backend
         cart: [],
         name: "",
         phone: "",
@@ -15,33 +15,36 @@ new Vue({
     },
 
     mounted() {
-        // Load lessons from backend
         fetch("https://backend-1-sits.onrender.com/lessons")
             .then(res => res.json())
             .then(data => {
-                this.lessons = data;
+                // Ensure backend provides space as a NUMBER
+                this.lessons = data.map(l => ({
+                    ...l,
+                    space: Number(l.space)
+                }));
             })
             .catch(err => console.error("Error loading lessons:", err));
     },
 
     computed: {
-        // FILTER + SORT
         sortedLessons() {
             let sorted = [...this.lessons];
 
-            // SORT
+            // Sorting
             sorted.sort((a, b) => {
-                let modifier = this.sortOrder === "ascending" ? 1 : -1;
-                if (a[this.sortAttribute] < b[this.sortAttribute]) return -1 * modifier;
-                if (a[this.sortAttribute] > b[this.sortAttribute]) return 1 * modifier;
+                let mod = this.sortOrder === "ascending" ? 1 : -1;
+
+                if (a[this.sortAttribute] < b[this.sortAttribute]) return -1 * mod;
+                if (a[this.sortAttribute] > b[this.sortAttribute]) return 1 * mod;
                 return 0;
             });
 
-            // FILTER
+            // Search
             if (this.searchQuery.trim() !== "") {
                 const q = this.searchQuery.toLowerCase();
                 sorted = sorted.filter(l =>
-                    l.subject.toLowerCase().includes(q) ||
+                    l.topic.toLowerCase().includes(q) ||
                     l.location.toLowerCase().includes(q)
                 );
             }
@@ -49,16 +52,14 @@ new Vue({
             return sorted;
         },
 
-        // TOTAL PRICE
         totalPrice() {
-            return this.cart.reduce((sum, item) =>
+            return this.cart.reduce((sum, item) => 
                 sum + item.price * item.quantity, 0);
         },
 
-        // CHECKOUT VALIDATION
         isCheckoutValid() {
-            const nameValid = /^[A-Za-z\s]+$/.test(this.name);
-            const phoneValid = /^[0-9]+$/.test(this.phone);
+            const nameValid = /^[A-Za-z\s]{2,}$/.test(this.name);
+            const phoneValid = /^[0-9]{10,}$/.test(this.phone);
             return nameValid && phoneValid && this.cart.length > 0;
         }
     },
@@ -68,9 +69,9 @@ new Vue({
             this.showLessons = !this.showLessons;
         },
 
-        // ADD TO CART
         addToCart(lesson) {
-            if (lesson.spaces > 0) {
+            if (lesson.space > 0) {
+
                 let existing = this.cart.find(item => item.id === lesson._id);
 
                 if (existing) {
@@ -78,23 +79,24 @@ new Vue({
                 } else {
                     this.cart.push({
                         id: lesson._id,
-                        subject: lesson.subject,
+                        topic: lesson.topic,
                         location: lesson.location,
                         price: lesson.price,
+                        image: lesson.image,
                         quantity: 1
                     });
                 }
 
-                lesson.spaces--;
+                lesson.space -= 1;  // FIXED: decrease space correctly
             }
         },
 
         increaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
 
-            if (lesson.spaces > 0) {
-                item.quantity++;
-                lesson.spaces--;
+            if (lesson.space > 0) {
+                item.quantity += 1;
+                lesson.space -= 1;
             }
         },
 
@@ -102,8 +104,8 @@ new Vue({
             let lesson = this.lessons.find(l => l._id === item.id);
 
             if (item.quantity > 1) {
-                item.quantity--;
-                lesson.spaces++;
+                item.quantity -= 1;
+                lesson.space += 1;
             } else {
                 this.removeFromCart(item);
             }
@@ -111,15 +113,17 @@ new Vue({
 
         removeFromCart(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-            lesson.spaces += item.quantity;
+
+            if (lesson) {
+                lesson.space += item.quantity;
+            }
 
             this.cart = this.cart.filter(i => i.id !== item.id);
         },
 
-        // CHECKOUT ORDER
         checkout() {
             if (!this.isCheckoutValid) {
-                alert("Please enter a valid name, phone number, and have at least one item.");
+                alert("Please enter a valid name and phone number (10 digits).");
                 return;
             }
 
@@ -138,11 +142,10 @@ new Vue({
                 body: JSON.stringify(order)
             })
                 .then(res => res.json())
-                .then(data => {
+                .then(() => {
                     alert(`Thank you, ${this.name}! Your order has been submitted.`);
-                    this.orderConfirmed = true;
 
-                    // RESET UI
+                    this.orderConfirmed = true;
                     this.cart = [];
                     this.name = "";
                     this.phone = "";
