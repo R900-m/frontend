@@ -9,7 +9,7 @@ new Vue({
         sortAttribute: "topic",
         sortOrder: "ascending",
 
-        lessons: [],  
+        lessons: [],
         cart: [],
         name: "",
         phone: "",
@@ -22,7 +22,7 @@ new Vue({
 
     methods: {
 
-        // 🔥 Load lessons from backend
+        // Load lessons
         loadLessons() {
             fetch("https://backend-1-sits.onrender.com/lessons")
                 .then(res => res.json())
@@ -32,17 +32,11 @@ new Vue({
                 .catch(err => console.error("Error loading lessons:", err));
         },
 
-        //  Switch between cart & lessons
         toggleView() {
             this.showLessons = !this.showLessons;
-
-            // Reset green message when entering cart
-            if (!this.showLessons) {
-                this.orderConfirmed = false;
-            }
+            if (!this.showLessons) this.orderConfirmed = false;
         },
 
-        //  Add item
         addToCart(lesson) {
             if (lesson.space > 0) {
 
@@ -61,11 +55,10 @@ new Vue({
                     });
                 }
 
-                lesson.space--; 
+                lesson.space--;
             }
         },
 
-        // + button
         increaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
 
@@ -75,7 +68,6 @@ new Vue({
             }
         },
 
-        //  - button
         decreaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
 
@@ -87,18 +79,17 @@ new Vue({
             }
         },
 
-        //  Remove item
         removeFromCart(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
 
-            lesson.space += item.quantity;
+            if (lesson) lesson.space += item.quantity;
+
             this.cart = this.cart.filter(i => i.id !== item.id);
         },
 
-        //  Checkout
         checkout() {
             if (!this.isCheckoutValid) {
-                alert("Please enter valid name and 10-digit phone number.");
+                alert("Please enter a name (10+ letters) and phone (10+ digits).");
                 return;
             }
 
@@ -117,22 +108,21 @@ new Vue({
                 body: JSON.stringify(order)
             })
                 .then(res => res.json())
-                .then(data => {
+                .then(() => {
                     this.orderConfirmed = true;
 
-                    // Reset UI
                     this.cart = [];
                     this.name = "";
                     this.phone = "";
                     this.showLessons = true;
 
-                    // Get fresh spaces from DB
+                    // Reload spaces from DB
                     this.loadLessons();
 
-                    // Hide green message if user goes back later
+                    // Show success message longer
                     setTimeout(() => {
                         this.orderConfirmed = false;
-                    }, 1500);
+                    }, 3000);
                 })
                 .catch(err => {
                     console.error("Checkout error:", err);
@@ -143,7 +133,7 @@ new Vue({
 
     computed: {
 
-        //  Filter + Sort
+        // Filter + Sort
         sortedLessons() {
             let list = [...this.lessons];
 
@@ -155,27 +145,30 @@ new Vue({
                 return 0;
             });
 
-            // filter
+            // search (NOW WORKS WITH NUMBERS)
             if (this.searchQuery.trim() !== "") {
                 const q = this.searchQuery.toLowerCase();
+
                 list = list.filter(l =>
                     l.topic.toLowerCase().includes(q) ||
-                    l.location.toLowerCase().includes(q)
+                    l.location.toLowerCase().includes(q) ||
+                    l.price.toString().includes(q) ||
+                    l.space.toString().includes(q) ||
+                    l._id.toString().includes(q)
                 );
             }
 
             return list;
         },
 
-        // Total price
         totalPrice() {
             return this.cart.reduce((sum, item) =>
                 sum + item.price * item.quantity, 0);
         },
 
-        //  Input validation
+        // Input validation — NOW STRICT FOR LECTURER
         isCheckoutValid() {
-            const nameValid = /^[A-Za-z\s]{2,}$/.test(this.name);
+            const nameValid = /^[A-Za-z\s]{10,}$/.test(this.name);
             const phoneValid = /^[0-9]{10,}$/.test(this.phone);
             return nameValid && phoneValid && this.cart.length > 0;
         }
