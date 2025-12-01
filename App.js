@@ -7,7 +7,7 @@ new Vue({
         sortAttribute: "topic",
         sortOrder: "ascending",
 
-        lessons: [],  // Loaded from backend
+        lessons: [],  
         cart: [],
         name: "",
         phone: "",
@@ -15,56 +15,19 @@ new Vue({
     },
 
     mounted() {
-        fetch("https://backend-1-sits.onrender.com/lessons")
-            .then(res => res.json())
-            .then(data => {
-                // Ensure backend provides space as a NUMBER
-                this.lessons = data.map(l => ({
-                    ...l,
-                    space: Number(l.space)
-                }));
-            })
-            .catch(err => console.error("Error loading lessons:", err));
-    },
-
-    computed: {
-        sortedLessons() {
-            let sorted = [...this.lessons];
-
-            // Sorting
-            sorted.sort((a, b) => {
-                let mod = this.sortOrder === "ascending" ? 1 : -1;
-
-                if (a[this.sortAttribute] < b[this.sortAttribute]) return -1 * mod;
-                if (a[this.sortAttribute] > b[this.sortAttribute]) return 1 * mod;
-                return 0;
-            });
-
-            // Search
-            if (this.searchQuery.trim() !== "") {
-                const q = this.searchQuery.toLowerCase();
-                sorted = sorted.filter(l =>
-                    l.topic.toLowerCase().includes(q) ||
-                    l.location.toLowerCase().includes(q)
-                );
-            }
-
-            return sorted;
-        },
-
-        totalPrice() {
-            return this.cart.reduce((sum, item) => 
-                sum + item.price * item.quantity, 0);
-        },
-
-        isCheckoutValid() {
-            const nameValid = /^[A-Za-z\s]{2,}$/.test(this.name);
-            const phoneValid = /^[0-9]{10,}$/.test(this.phone);
-            return nameValid && phoneValid && this.cart.length > 0;
-        }
+        this.loadLessons();
     },
 
     methods: {
+
+        loadLessons() {
+            fetch("https://backend-1-sits.onrender.com/lessons")
+                .then(res => res.json())
+                .then(data => {
+                    this.lessons = data;
+                });
+        },
+
         toggleView() {
             this.showLessons = !this.showLessons;
         },
@@ -87,25 +50,23 @@ new Vue({
                     });
                 }
 
-                lesson.space -= 1;  // FIXED: decrease space correctly
+                lesson.space--;
             }
         },
 
         increaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-
             if (lesson.space > 0) {
-                item.quantity += 1;
-                lesson.space -= 1;
+                item.quantity++;
+                lesson.space--;
             }
         },
 
         decreaseQuantity(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-
             if (item.quantity > 1) {
-                item.quantity -= 1;
-                lesson.space += 1;
+                item.quantity--;
+                lesson.space++;
             } else {
                 this.removeFromCart(item);
             }
@@ -113,17 +74,13 @@ new Vue({
 
         removeFromCart(item) {
             let lesson = this.lessons.find(l => l._id === item.id);
-
-            if (lesson) {
-                lesson.space += item.quantity;
-            }
-
+            lesson.space += item.quantity;
             this.cart = this.cart.filter(i => i.id !== item.id);
         },
 
         checkout() {
             if (!this.isCheckoutValid) {
-                alert("Please enter a valid name and phone number (10 digits).");
+                alert("Please enter valid details.");
                 return;
             }
 
@@ -142,19 +99,52 @@ new Vue({
                 body: JSON.stringify(order)
             })
                 .then(res => res.json())
-                .then(() => {
-                    alert(`Thank you, ${this.name}! Your order has been submitted.`);
-
+                .then(data => {
                     this.orderConfirmed = true;
+
+                    // Reset UI
                     this.cart = [];
                     this.name = "";
                     this.phone = "";
                     this.showLessons = true;
-                })
-                .catch(err => {
-                    console.error("Checkout error:", err);
-                    alert("Something went wrong submitting your order.");
+
+                    // Reload updated spaces
+                    this.loadLessons();
                 });
+        }
+    },
+
+    computed: {
+        sortedLessons() {
+            let sorted = [...this.lessons];
+            let mod = this.sortOrder === "ascending" ? 1 : -1;
+
+            sorted.sort((a, b) => {
+                if (a[this.sortAttribute] < b[this.sortAttribute]) return -1 * mod;
+                if (a[this.sortAttribute] > b[this.sortAttribute]) return 1 * mod;
+                return 0;
+            });
+
+            if (this.searchQuery.trim() !== "") {
+                const q = this.searchQuery.toLowerCase();
+                sorted = sorted.filter(l =>
+                    l.topic.toLowerCase().includes(q) ||
+                    l.location.toLowerCase().includes(q)
+                );
+            }
+
+            return sorted;
+        },
+
+        totalPrice() {
+            return this.cart.reduce((sum, item) =>
+                sum + item.price * item.quantity, 0);
+        },
+
+        isCheckoutValid() {
+            const nameValid = /^[A-Za-z\s]{2,}$/.test(this.name);
+            const phoneValid = /^[0-9]{10,}$/.test(this.phone);
+            return nameValid && phoneValid && this.cart.length > 0;
         }
     }
 });
