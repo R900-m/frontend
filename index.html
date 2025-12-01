@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <title>After School Activities</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style1.css" />
+
+    <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 </head>
 
@@ -46,6 +50,7 @@
         <div class="lesson-list">
             <div v-for="lesson in sortedLessons" :key="lesson._id" class="lesson-card">
 
+                <!-- Image -->
                 <img :src="'images' + lesson.image.replace('/images', '')" alt="Lesson image" />
 
                 <h3>{{ lesson.topic }}</h3>
@@ -64,9 +69,61 @@
     <main v-else class="cart-page">
         <h2>Your Cart</h2>
 
+        <!-- Empty cart -->
         <div v-if="cart.length === 0">
             <p>Your cart is empty.</p>
         </div>
 
+        <!-- Cart list -->
         <div v-else>
-            <div v-for="i
+            <div v-for="item in cart" :key="item.id" class="cart-item">
+
+                <!-- Cart image -->
+                <img :src="'images' + item.image.replace('/images', '')" />
+
+                <div>
+                    <h4>{{ item.topic }}</h4>
+                    <p><strong>Location:</strong> {{ item.location }}</p>
+                    <p><strong>Price:</strong> £{{ item.price }}</p>
+
+                    <p>
+                        <strong>Quantity:</strong>
+                        <button class="quantity-btn" @click="decreaseQuantity(item)">-</button>
+                        {{ item.quantity }}
+                        <button class="quantity-btn" @click="increaseQuantity(item)">+</button>
+                    </p>
+
+                    <p><strong>Total:</strong> £{{ item.price * item.quantity }}</p>
+
+                    <button class="remove-btn" @click="removeFromCart(item)">Remove</button>
+                </div>
+
+            </div>
+
+            <!-- Checkout -->
+            <div class="checkout-form">
+                <h3>Checkout</h3>
+
+                <input type="text" v-model="name" placeholder="Enter your name (min 10 letters)" />
+                <input type="text" v-model="phone" placeholder="Enter phone number (10 digits)" />
+
+                <p><strong>Total Price:</strong> £{{ totalPrice }}</p>
+
+                <button @click="checkout" :disabled="!isCheckoutValid">Checkout</button>
+
+                <!-- Success popup -->
+                <div v-if="orderConfirmed" class="confirmation">
+                    ✓ Order submitted successfully! Thank you for booking.
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- JS -->
+<script src="App.js"></script>
+
+</body>
+</html>
