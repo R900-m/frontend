@@ -29,15 +29,15 @@ The front-end communicates with my deployed backend:
 ---
 
 # Features of This Front-End
-✔ Loads lessons from back-end via Fetch API
-✔ Search bar to filter lessons
-✔ Sorting (subject, price, location, spaces)
-✔ Add lessons to cart 
-✔ Prevent ordering more than available spaces 
-✔ Checkout form (name + phone validation)  
-✔ Sends new orders to back-end  
-✔ Updates lesson spaces after ordering  
-✔ Responsive and user-friendly interface
+- Loads lessons from back-end via Fetch API
+- Search bar to filter lessons
+- Sorting (subject, price, location, spaces)
+- Add lessons to cart 
+- Prevent ordering more than available spaces 
+- Checkout form (name + phone validation)  
+- Sends new orders to back-end  
+- Updates lesson spaces after ordering  
+- Responsive and user-friendly interface
 
 ---
 
